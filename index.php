@@ -39,8 +39,14 @@ class Watermark implements SplObserver {
 			$query	= file_get_contents($file);
 
 			# Create table
-			if (!isset($query)||$query===false) return false;
-			if (!$this->database->query($query)) return false;
+			if (!isset($query)||$query===false) {
+				Log::error($this->database, __METHOD__, __LINE__, 'Could not read .sql file for watermarks-table');
+				return false;
+			}
+			if (!$this->database->query($query)) {
+				Log::error($this->database, __METHOD__, __LINE__, 'Could not create table watermarks in database');
+				return false;
+			}
 
 		}
 
@@ -55,7 +61,10 @@ class Watermark implements SplObserver {
 
 		# Get watermark info
 		$watermark = $this->get(1);
-		if ($watermark===false) return false;
+		if ($watermark===false) {
+			Log::error($this->database, __METHOD__, __LINE__, 'Specified watermark not found in database');
+			return false;
+		}
 
 		# Set watermark info
 		$old_path	= null;
@@ -84,17 +93,26 @@ class Watermark implements SplObserver {
 			# Import if uploaded via web
 			if (is_uploaded_file($old_path)) {
 				$move_path = LYCHEE_DATA . 'watermark_moved.jpeg';
-				if (!@copy($old_path, $move_path)) exit('Error: Could not temporary copy photo to data!');
+				if (!@copy($old_path, $move_path)) {
+					Log::error($this->database, __METHOD__, __LINE__, 'Could not temporary copy photo to data');
+					return false;
+				}
 				$old_path = $move_path;
 			}
 
 			# Create watermark image
 			$return = $this->addText($old_path, $new_path, $text, $font_path, $font_size, $font_color, $position);
-			if ($return!==true) return false;
+			if ($return!==true) {
+				Log::error($this->database, __METHOD__, __LINE__, 'Failed to add watermark text to photo. Function returned: ' . $return);
+				return false;
+			}
 
 			# Import new image
 			$return = Import::photo($this->database, null, $this->settings, $new_path, $albumID, $description, $tags);
-			if ($return!==true) return false;
+			if ($return!==true) {
+				Log::error($this->database, __METHOD__, __LINE__, 'Failed to import watermarked photo. Import returned: ' . $return);
+				return false;
+			}
 
 		}
 
@@ -145,6 +163,10 @@ class Watermark implements SplObserver {
 
 		# Parse position
 		$position = $this->getPosition($info, $position);
+		if ($position===false) {
+			Log::error($this->database, __METHOD__, __LINE__, 'Could not calculate position for watermark. Function returned: ' . $position);
+			return false;
+		}
 
 		# Place text
 		imagecopyresampled($image, $sourceImg, 0, 0, 0, 0, $info[0], $info[1], $info[0], $info[1]);
