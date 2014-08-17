@@ -8,6 +8,9 @@
 
 if (!defined('LYCHEE')) exit('Error: Direct access is not allowed!');
 
+use gdenhancer\GDEnhancer;
+include_once('gdenhancer/src/gdenhancer/GDEnhancer.php');
+
 class Watermark implements SplObserver {
 
 	private $database = null;
@@ -72,8 +75,8 @@ class Watermark implements SplObserver {
 		$text		= $watermark->text;
 		$font_path	= __DIR__ . '/' . $watermark->font_path;
 		$font_size	= $watermark->font_size;
-		$font_color	= array('red' => $watermark->font_color_red, 'green' => $watermark->font_color_green, 'blue' => $watermark->font_color_blue);
-		$position	= array('x' => $watermark->position_x, 'y' => $watermark->position_y);
+		$font_color	= $watermark->font_color;
+		$position	= array('align' => $watermark->position_align, 'x' => $watermark->position_x, 'y' => $watermark->position_y);
 
 		# Set import info
 		$albumID		= @$subject->args[1];
@@ -131,49 +134,16 @@ class Watermark implements SplObserver {
 
 	}
 
-	private function getPosition($info, $position) {
-
-		if (!isset($position)) return false;
-
-		if ($position['x']<0) $position['x'] = $info[0] + $position['x'];
-		if ($position['y']<0) $position['y'] = $info[1] + $position['y'];
-
-		return $position;
-
-	}
-
 	private function addText($old_path, $new_path, $text, $font_path, $font_size, $font_color, $position) {
 
 		if (!isset($this->database, $old_path, $new_path, $text, $font_path, $font_size, $font_color, $position)) return 'Missing parameters';
 
-		# Get info
-		$info = getimagesize($old_path);
+		$image = new GDEnhancer($old_path);
+		$image->layerText($text, $font_path, $font_size, $font_color, 0, 0.7);
+		$image->layerMove(0, $position['align'], $position['x'], $position['y']);
 
-		# Convert image
-		switch($info['mime']) {
-			case 'image/jpeg':	$sourceImg = imagecreatefromjpeg($old_path); break;
-			case 'image/png':	$sourceImg = imagecreatefrompng($old_path); break;
-			case 'image/gif':	$sourceImg = imagecreatefromgif($old_path); break;
-			default: return false;
-		}
-
-		# Create new image
-		$image = imagecreatetruecolor($info[0], $info[1]);
-		$color = imagecolorallocate($image, $font_color['red'], $font_color['green'], $font_color['blue']);
-
-		# Parse position
-		$position = $this->getPosition($info, $position);
-		if ($position===false) {
-			Log::error($this->database, __METHOD__, __LINE__, 'Could not calculate position for watermark. Function returned: ' . $position);
-			return false;
-		}
-
-		# Place text
-		imagecopyresampled($image, $sourceImg, 0, 0, 0, 0, $info[0], $info[1], $info[0], $info[1]);
-		imagedestroy($sourceImg);
-		imagettftext($image, $font_size, 0, $position['x'], $position['y'], $color, $font_path, $text);
-		imagejpeg($image, $new_path, 100);
-		imagedestroy($image);
+		$save = $image->save();
+		file_put_contents($new_path, $save['contents']);
 
 		return true;
 
