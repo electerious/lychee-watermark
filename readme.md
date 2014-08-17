@@ -1,10 +1,10 @@
 # Watermark
 
-Watermark is a plugin for [Lychee](https://github.com/electerious/Lychee), which adds a second watermarked photo when uploading photos.
+Watermark is a plugin for [Lychee](https://github.com/electerious/Lychee). It adds a second watermarked photo when uploading images.
 
 ## Installation
 
-This extension requires a working [Lychee](https://github.com/electerious/Lychee) v2.5 (or newer) on your computer or server.
+This extension requires a working [Lychee](https://github.com/electerious/Lychee) v2.6 (or newer) on your computer or server.
 
 #### 1. Download
 
@@ -41,6 +41,17 @@ The watermarks are specified in the table `lychee_watermarks` of your database. 
 | `position_align` | `topleft`, `topcenter`, `topright`, `centerleft`, `center` … |
 | `position_x` | x-offset in px |
 | `position_y` | y-offset in px |
+
+## FAQ
+
+#### What do I need to run this plugin on my server?
+This plugin has the same dependencies as Lychee. Depending on the size of the photos, the plugin (and php) my need a higher memory_limit. More below.
+
+#### I can't upload photos
+We recommend to increase the values of the following properties in your `php.ini`:
+
+	max_execution_time = 200
+	memory_limit = 512M
 
 ## License
 
