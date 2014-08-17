@@ -1,0 +1,4 @@
+[submodule "gdenhancer"]
+	path = gdenhancer
+	url = https://github.com/coldume/GDEnhancer
+	fetchRecurseSubmodules = false
