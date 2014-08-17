@@ -26,6 +26,10 @@ class Watermark implements SplObserver {
 		if (!$this->database->query('SELECT * FROM lychee_watermarks LIMIT 0;'))
 			if (!$this->createTable()) exit('Error: Could not create table for watermarks!');
 
+		# Check content
+		if ($this->database->query('SELECT * FROM lychee_watermarks;')->num_rows===0)
+			if (!$this->createRow()) exit('Error: Could not add a new watermark to the watermarks table!');
+
 		return true;
 
 	}
@@ -57,13 +61,28 @@ class Watermark implements SplObserver {
 
 	}
 
+	private function createRow() {
+
+		if (!isset($this->database)) return false;
+
+		$query = "INSERT INTO `lychee_watermarks` (`active`, `description`, `type`, `text`, `font_path`, `font_size`, `font_color`, `position_align`, `position_x`, `position_y`) VALUES (1, 'Default', 'text', 'Lorem ipsum', 'SourceSansPro.ttf', '42', '#ffffff', 'center', '0', '0');";
+
+		if (!$this->database->query($query)) {
+			Log::error($this->database, __METHOD__, __LINE__, 'Could not add a new watermark to the watermarks table');
+			return false;
+		}
+
+		return true;
+
+	}
+
 	public function update(\SplSubject $subject) {
 
 		if ($subject->action!=='Photo::add:before') return false;
 		if (!isset($subject->args[0][0]['tmp_name'])) return false;
 
 		# Get watermark info
-		$watermark = $this->get(1);
+		$watermark = $this->get();
 		if ($watermark===false) {
 			Log::error($this->database, __METHOD__, __LINE__, 'Specified watermark not found in database');
 			return false;
@@ -123,11 +142,11 @@ class Watermark implements SplObserver {
 
 	}
 
-	private function get($id) {
+	private function get() {
 
-		if (!isset($this->database, $id)) return false;
+		if (!isset($this->database)) return false;
 
-		$watermarks	= $this->database->query("SELECT * FROM lychee_watermarks WHERE id = '$id' LIMIT 1;");
+		$watermarks	= $this->database->query("SELECT * FROM lychee_watermarks WHERE active = '1' LIMIT 1;");
 		if ($watermarks->num_rows===0) return false;
 
 		return $watermarks->fetch_object();

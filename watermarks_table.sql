@@ -4,6 +4,7 @@
 
 CREATE TABLE `lychee_watermarks` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `active` TINYINT(1) NOT NULL DEFAULT '0',
   `description` varchar(1000) DEFAULT NULL,
   `type` varchar(10) NOT NULL DEFAULT 'text',
   `text` varchar(200) NOT NULL DEFAULT '',
