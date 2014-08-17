@@ -91,10 +91,14 @@ class Watermark implements SplObserver {
 		# Set watermark info
 		$old_path	= null;
 		$new_path	= LYCHEE_DATA . 'watermark_temp.jpeg';
+
+		# Set text
 		$text		= $watermark->text;
 		$font_path	= __DIR__ . '/' . $watermark->font_path;
 		$font_size	= $watermark->font_size;
 		$font_color	= $watermark->font_color;
+
+		# Set position
 		$position	= array('align' => $watermark->position_align, 'x' => $watermark->position_x, 'y' => $watermark->position_y);
 
 		# Set import info
