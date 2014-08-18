@@ -94,10 +94,11 @@ class Watermark implements SplObserver {
 		$type		= $watermark->type;
 
 		# Set text
-		$text		= $watermark->text;
-		$font_path	= __DIR__ . '/' . $watermark->font_path;
-		$font_size	= $watermark->font_size;
-		$font_color	= $watermark->font_color;
+		$text			= $watermark->text;
+		$font_path		= __DIR__ . '/' . $watermark->font_path;
+		$font_size		= $watermark->font_size;
+		$font_color		= $watermark->font_color;
+		$font_bgcolor	= $watermark->font_bgcolor;
 
 		# Set image
 		$image_path	= __DIR__ . '/' . $watermark->image_path;
@@ -133,7 +134,7 @@ class Watermark implements SplObserver {
 			if ($type==='text') {
 
 				# Watermark with text
-				$return = $this->addText($old_path, $new_path, $text, $font_path, $font_size, $font_color, $position);
+				$return = $this->addText($old_path, $new_path, $text, $font_path, $font_size, $font_color, $font_bgcolor, $position);
 				if ($return!==true) {
 					Log::error($this->database, __METHOD__, __LINE__, 'Failed to watermark photo with text. Function returned: ' . $return);
 					return false;
@@ -174,13 +175,15 @@ class Watermark implements SplObserver {
 
 	}
 
-	private function addText($old_path, $new_path, $text, $font_path, $font_size, $font_color, $position) {
+	private function addText($old_path, $new_path, $text, $font_path, $font_size, $font_color, $font_bgcolor, $position) {
 
-		if (!isset($this->database, $old_path, $new_path, $text, $font_path, $font_size, $font_color, $position)) return 'Missing parameters';
+		if (!isset($this->database, $old_path, $new_path, $text, $font_path, $font_size, $font_color, $font_bgcolor, $position)) return 'Missing parameters';
 
 		$image = new GDEnhancer($old_path);
 		$image->layerText($text, $font_path, $font_size, $font_color, 0, 0.7);
 		$image->layerMove(0, $position['align'], $position['x'], $position['y']);
+
+		if ($font_bgcolor!=="") $image->layerTextBlock(0, array(10, 2, 2, 2), $font_bgcolor);
 
 		$save = $image->save();
 		file_put_contents($new_path, $save['contents']);

@@ -11,6 +11,7 @@ CREATE TABLE `lychee_watermarks` (
   `font_path` varchar(1000) DEFAULT 'SourceSansPro.ttf',
   `font_size` int(11) NOT NULL DEFAULT '32',
   `font_color` varchar(7) DEFAULT '#ffffff',
+  `font_bgcolor` varchar(7) DEFAULT '#444444',
   `image_path` varchar(1000) DEFAULT 'Image.png',
   `position_align` varchar(15) DEFAULT 'center',
   `position_x` int(11) NOT NULL DEFAULT '0',
