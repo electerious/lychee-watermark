@@ -91,12 +91,16 @@ class Watermark implements SplObserver {
 		# Set watermark info
 		$old_path	= null;
 		$new_path	= LYCHEE_DATA . 'watermark_temp.jpeg';
+		$type		= $watermark->type;
 
 		# Set text
 		$text		= $watermark->text;
 		$font_path	= __DIR__ . '/' . $watermark->font_path;
 		$font_size	= $watermark->font_size;
 		$font_color	= $watermark->font_color;
+
+		# Set image
+		$image_path	= __DIR__ . '/' . $watermark->image_path;
 
 		# Set position
 		$position	= array('align' => $watermark->position_align, 'x' => $watermark->position_x, 'y' => $watermark->position_y);
@@ -126,11 +130,24 @@ class Watermark implements SplObserver {
 				$old_path = $move_path;
 			}
 
-			# Create watermark image
-			$return = $this->addText($old_path, $new_path, $text, $font_path, $font_size, $font_color, $position);
-			if ($return!==true) {
-				Log::error($this->database, __METHOD__, __LINE__, 'Failed to add watermark text to photo. Function returned: ' . $return);
-				return false;
+			if ($type==='text') {
+
+				# Watermark with text
+				$return = $this->addText($old_path, $new_path, $text, $font_path, $font_size, $font_color, $position);
+				if ($return!==true) {
+					Log::error($this->database, __METHOD__, __LINE__, 'Failed to watermark photo with text. Function returned: ' . $return);
+					return false;
+				}
+
+			} else {
+
+				# Watermark with photo
+				$return = $this->addImage($old_path, $new_path, $image_path, $position);
+				if ($return!==true) {
+					Log::error($this->database, __METHOD__, __LINE__, 'Failed to watermark photo with image. Function returned: ' . $return);
+					return false;
+				}
+
 			}
 
 			# Import new image
@@ -163,6 +180,21 @@ class Watermark implements SplObserver {
 
 		$image = new GDEnhancer($old_path);
 		$image->layerText($text, $font_path, $font_size, $font_color, 0, 0.7);
+		$image->layerMove(0, $position['align'], $position['x'], $position['y']);
+
+		$save = $image->save();
+		file_put_contents($new_path, $save['contents']);
+
+		return true;
+
+	}
+
+	private function addImage($old_path, $new_path, $image_path, $position) {
+
+		if (!isset($this->database, $old_path, $new_path, $image_path, $position)) return 'Missing parameters';
+
+		$image = new GDEnhancer($old_path);
+		$image->layerImage($image_path);
 		$image->layerMove(0, $position['align'], $position['x'], $position['y']);
 
 		$save = $image->save();
