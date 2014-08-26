@@ -121,6 +121,17 @@ class Watermark implements SplObserver {
 			# Set watermark info
 			$old_path = $file['tmp_name'];
 
+			# New photo class
+			$photo = new Photo($this->database, null, null, null);
+
+			# Read infos
+			$info = $photo->getInfo($old_path);
+
+			# Set orientation based on EXIF data
+			if (isset($info['orientation'], $info['width'], $info['height'])&&$info['orientation']!=='') {
+				if (!$photo->adjustFile($old_path, $info)) Log::notice($this->database, __METHOD__, __LINE__, 'Could not adjust photo (' . $info['title'] . ')');
+			}
+
 			# Import if uploaded via web
 			if (is_uploaded_file($old_path)) {
 				$move_path = LYCHEE_DATA . 'watermark_moved.jpeg';
