@@ -4,7 +4,7 @@ Watermark is a plugin for [Lychee](https://github.com/electerious/Lychee). It ad
 
 ## Installation
 
-This extension requires a working [Lychee](https://github.com/electerious/Lychee) v2.6.2 (or newer) on your computer or server.
+This extension requires a working [Lychee](https://github.com/electerious/Lychee) **v2.6.2 (or newer)** on your computer or server.
 
 #### 1. Download
 
