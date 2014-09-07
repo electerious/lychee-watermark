@@ -127,6 +127,12 @@ class Watermark implements SplObserver {
 			# Read infos
 			$info = $photo->getInfo($old_path);
 
+			# Move to data-folder before adjusting and loosing the metadata of the photo
+			if (!@copy($old_path, $new_path)) {
+				Log::error($this->database, __METHOD__, __LINE__, 'Could not copy photo to data before watermarking');
+				exit('Error: Could not copy photo to data before watermarking!');
+			} else $old_path = $new_path;
+
 			# Set orientation based on EXIF data
 			if (isset($info['orientation'], $info['width'], $info['height'])&&$info['orientation']!=='') {
 				if (!$photo->adjustFile($old_path, $info)) Log::notice($this->database, __METHOD__, __LINE__, 'Could not adjust photo (' . $info['title'] . ')');
