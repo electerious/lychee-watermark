@@ -135,7 +135,7 @@ class Watermark implements SplObserver {
 
 			# Set orientation based on EXIF data
 			if (isset($info['orientation'], $info['width'], $info['height'])&&$info['orientation']!=='') {
-				if (!$photo->adjustFile($old_path, $info)) Log::notice($this->database, __METHOD__, __LINE__, 'Could not adjust photo (' . $info['title'] . ')');
+				if (!$photo->adjustFile($new_path, $info)) Log::notice($this->database, __METHOD__, __LINE__, 'Could not adjust photo (' . $info['title'] . ')');
 			}
 
 			# Import if uploaded via web
