@@ -10,7 +10,7 @@ This extension requires a working [Lychee](https://github.com/electerious/Lychee
 
 Navigate to the plugin-folder (`plugins/`) of your Lychee and run the following command:
 
-	git clone --recursive https://github.com/electerious/lychee-watermark.git
+	git clone --recursive https://github.com/electerious/lychee-watermark.git watermark
 	
 GitHub doesn't support submodules when you hit the download button on their site. This means that **you must use the command above** to get the full code.
 
