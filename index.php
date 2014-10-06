@@ -131,27 +131,17 @@ class Watermark implements SplObserver {
 			if (!@copy($old_path, $new_path)) {
 				Log::error($this->database, __METHOD__, __LINE__, 'Could not copy photo to data before watermarking');
 				exit('Error: Could not copy photo to data before watermarking!');
-			} else $old_path = $new_path;
+			}
 
 			# Set orientation based on EXIF data
 			if (isset($info['orientation'], $info['width'], $info['height'])&&$info['orientation']!=='') {
 				if (!$photo->adjustFile($new_path, $info)) Log::notice($this->database, __METHOD__, __LINE__, 'Could not adjust photo (' . $info['title'] . ')');
 			}
 
-			# Import if uploaded via web
-			if (is_uploaded_file($old_path)) {
-				$move_path = LYCHEE_DATA . 'watermark_moved.jpeg';
-				if (!@copy($old_path, $move_path)) {
-					Log::error($this->database, __METHOD__, __LINE__, 'Could not temporary copy photo to data');
-					return false;
-				}
-				$old_path = $move_path;
-			}
-
 			if ($type==='text') {
 
 				# Watermark with text
-				$return = $this->addText($old_path, $new_path, $text, $font_path, $font_size, $font_color, $font_bgcolor, $position);
+				$return = $this->addText($new_path, $new_path, $text, $font_path, $font_size, $font_color, $font_bgcolor, $position);
 				if ($return!==true) {
 					Log::error($this->database, __METHOD__, __LINE__, 'Failed to watermark photo with text. Function returned: ' . $return);
 					return false;
@@ -160,7 +150,7 @@ class Watermark implements SplObserver {
 			} else {
 
 				# Watermark with photo
-				$return = $this->addImage($old_path, $new_path, $image_path, $position);
+				$return = $this->addImage($new_path, $new_path, $image_path, $position);
 				if ($return!==true) {
 					Log::error($this->database, __METHOD__, __LINE__, 'Failed to watermark photo with image. Function returned: ' . $return);
 					return false;
