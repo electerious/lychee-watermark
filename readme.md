@@ -51,7 +51,7 @@ The watermarks are specified in the table `lychee_watermarks` of your database.
 ## FAQ
 
 #### What do I need to run this plugin on my server?
-This plugin has the same dependencies as Lychee. Depending on the size of the photos, the plugin (and php) my need a higher memory_limit. More below.
+This plugin has the same dependencies as Lychee. Depending on the size of the photos, the plugin (and php) may need a higher memory_limit. More below.
 
 #### I can't upload photos
 We recommend to increase the values of the following properties in your `php.ini`:
