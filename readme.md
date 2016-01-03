@@ -1,3 +1,5 @@
+> WARNING: This module has been deprecated.
+
 # Watermark
 
 Watermark is a plugin for [Lychee](https://github.com/electerious/Lychee). It adds a second watermarked photo when uploading images.
